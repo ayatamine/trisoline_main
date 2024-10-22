@@ -1,0 +1,83 @@
+models:
+  # Slider:
+  #   title: string:400 index
+  #   subtitle: string nullable
+  #   title_ar: string:400 index
+  #   subtitle_ar: string nullable
+  #   background: string
+  Service:
+    title: string:255 index
+    title_ar: string:255 index
+    description: text
+    description_ar: text
+    image: string nullable
+  ProjectType:
+    title: string:100
+    title_ar: string:100
+    relationships:
+      belongsToMany: Project
+  Project:
+    title: string:255 index
+    title_ar: string:255 index
+    thumbnail: string
+    relationships:
+      belongsToMany: ProjectType
+  # Image:
+  #   name: string
+  #   imageable_id: integer
+  #   imageable_type: string
+  Step:
+    title: string:255 index
+    description: text
+    title_ar: string:255 index
+    description_ar: text
+    image: string
+  Testimonial:
+    content: mediumText
+    client_name: string:255 default:"Unknown"
+    client_thumbnail: string default:"client.png"
+    client_country: string:255 nullable
+  # Client:
+  #   name: string:255 nullable
+  #   logo: string
+  Contact:
+    name: string:255
+    email: string email
+    subject: string email
+    message: mediumText
+
+  Setting:
+ 
+    app_name: string:255
+    app_logo: string:255
+    phone_number: string:255 nullable
+    address: string:255
+    contact_email: string:255
+    facebook_link: string:255 nullable
+    youtube_link: string:255 nullable
+    instagram_link: string:255 nullable
+    linkedin_link: string:255 nullable
+    twitter_link: string:255 nullable
+    intro_text: mediumText nullable
+    intro_text_ar: mediumText nullable
+    intro_sliding_words: mediumText nullable
+    whatsapp_number: string nullable
+    video_section_link: string nullable
+    about_text:  mediumText nullable
+    about_text_ar:  mediumText nullable
+    vision_text:  mediumText nullable
+    vision_text_ar:  mediumText nullable
+    goals_text:  mediumText nullable
+    goals_text_ar:  mediumText nullable
+    values_text:  mediumText nullable
+    values_text_ar:  mediumText nullable
+    default_lang: string default:"ar"
+    show_projects_section: boolean default:true
+    show_testimonials_section: boolean default:true
+    show_blog_section: boolean default:true
+    meta_title: string nullable
+    meta_image: string nullable
+    favicon: string nullable
+    meta_description: string nullable
+    meta_keywords: mediumText nullable
+# seeders:

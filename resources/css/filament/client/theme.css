@@ -1,0 +1,45 @@
+@import '/vendor/filament/filament/resources/css/theme.css';
+
+@config 'tailwind.config.js';
+.fi-main.max-w-7xl{
+    max-width: 80% !important;
+    width: 80% !important; 
+  }
+  .fi-sidebar-nav {@apply border bg-white shadow-md}
+  .dark .fi-sidebar-nav {@apply bg-gray-900}
+  .w-75{width: 75% !important;}
+
+.bg-green-500{
+    background-color: rgb(32, 155, 32);
+}
+.bg-red-500{
+    background-color: rgb(223, 40, 40);
+}
+.bg-blue-300{
+    background-color: rgb(60, 151, 212);
+}
+.min-h-43{    min-height: 43rem;}
+.rounded-l-xl{border-top-left-radius: 0.75rem; /* 12px */
+    border-bottom-left-radius: 0.75rem; /* 12px */}
+.rounded-r-xl{border-top-right-radius: 0.75rem; /* 12px */
+    border-bottom-right-radius: 0.75rem; /* 12px */}
+@media(min-width:992px)
+{
+    .w-80{width: 80%;}
+    .w-20{width: 20%;}
+    .w-50{width: 50%;}
+}
+.add-attachment-btn{
+    background: #fd9810ad;
+    font-weight: 600;
+    color: #fff;
+    padding: 0.5rem 1rem;border-radius: 8px;cursor: pointer;
+}
+.btn-submit{
+   padding: 0.5rem 2rem;
+}
+#quota-discussion .filepond--item{height: 50px !important;}
+#quota-discussion .filepond--root{
+    max-height: 200px;
+    overflow-y: scroll;
+}

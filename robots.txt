@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: 
+Disallow: /cgi-bin/
+Disallow: /storage
+Disallow: /transfer
+Sitemap: https://trisoline.com/sitemap.xml

@@ -1,0 +1,35 @@
+created:
+    - database/factories/ServiceFactory.php
+    - database/factories/ProjectTypeFactory.php
+    - database/factories/ProjectFactory.php
+    - database/factories/ImageFactory.php
+    - database/factories/StepFactory.php
+    - database/factories/TestimonialFactory.php
+    - database/factories/ContactFactory.php
+    - database/factories/SettingFactory.php
+    - database/migrations/2024_06_27_105626_create_services_table.php
+    - database/migrations/2024_06_27_105627_create_project_types_table.php
+    - database/migrations/2024_06_27_105628_create_projects_table.php
+    - database/migrations/2024_06_27_105629_create_images_table.php
+    - database/migrations/2024_06_27_105630_create_steps_table.php
+    - database/migrations/2024_06_27_105631_create_testimonials_table.php
+    - database/migrations/2024_06_27_105632_create_contacts_table.php
+    - database/migrations/2024_06_27_105633_create_settings_table.php
+    - database/migrations/2024_06_27_105634_create_project_project_type_table.php
+    - app/Models/Service.php
+    - app/Models/ProjectType.php
+    - app/Models/Project.php
+    - app/Models/Image.php
+    - app/Models/Step.php
+    - app/Models/Testimonial.php
+    - app/Models/Contact.php
+    - app/Models/Setting.php
+models:
+    Service: { title: 'string:255 index', title_ar: 'string:255 index', description: text, description_ar: text, image: 'string nullable' }
+    ProjectType: { title: 'string:100', title_ar: 'string:100', relationships: { belongsToMany: Project } }
+    Project: { title: 'string:255 index', title_ar: 'string:255 index', thumbnail: string, relationships: { belongsToMany: ProjectType } }
+    Image: { name: string, imageable_id: integer, imageable_type: string }
+    Step: { title: 'string:255 index', description: text, title_ar: 'string:255 index', description_ar: text, image: string }
+    Testimonial: { content: meiumText, client_name: 'string:255 default:"Unknown"', client_thumbnail: 'string default:"client.png"', client_country: 'string:255 nullable' }
+    Contact: { name: 'string:255', email: 'string email', subject: 'string email', message: mediumText }
+    Setting: { app_name: 'string:255', app_logo: 'string:255', phone_number: 'string:255 nullable', address: 'string:255', contact_email: 'string:255', facebook_link: 'string:255 nullable', youtube_link: 'string:255 nullable', instagram_link: 'string:255 nullable', linkedin_link: 'string:255 nullable', twitter_link: 'string:255 nullable', services_section_subtitle: 'mediumText nullable', contact_section_subtitle: 'mediumText nullable', whatsapp_number: 'string nullable', video_section_link: 'string nullable', about_text: 'mediumText nullable', about_text_ar: 'mediumText nullable', vision_text: 'mediumText nullable', vision_text_ar: 'mediumText nullable', goals_text: 'mediumText nullable', goals_text_ar: 'mediumText nullable', values_text: 'mediumText nullable', values_text_ar: 'mediumText nullable', default_lang: 'string default:"ar"' }
