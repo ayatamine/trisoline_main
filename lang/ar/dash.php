@@ -18,6 +18,7 @@ return [
 'expected_price'=>'السعر المتوقع',
 'name'=>'الاسم',
 'qte'=>'الكمية',
+'containers_count'=>'عدد الحاويات',
 'image'=>'صورة',
 'submit'=>'إرسال',
 'available_budget'=>'الميزانية المتاحة',
@@ -36,5 +37,8 @@ return [
 'go_back' => 'العودة',
 'accept_contract_text' => 'بالموافقة على هدا أنت تقبل',
 'accept_contract_title' => 'العقد والشروط',
+'expected_delivery_date' => 'تاريخ التسليم المتوقع',
+'real_delivery_date' => 'تاريخ التسليم الحقيقي',
+'order_discussion' => 'محادثة الطلب',
 
 ];

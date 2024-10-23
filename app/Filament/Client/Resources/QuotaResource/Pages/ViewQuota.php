@@ -31,7 +31,11 @@ class ViewQuota extends ViewRecord
     public function sendMessage()
     {
       try{
-        
+            $this->validate([ 
+                'content' => 'required|min:3',
+                'attachments' => 'sometimes|nullable',
+                'attachments.*' => 'max:2048',
+            ]);
             DB::beginTransaction();
 
           

@@ -146,7 +146,11 @@ class QuotaResource extends Resource
                     ->minItems(1)
                     ->defaultItems(1)
                     ->cloneable(),
-                    
+                    TextInput::make('containers_count')
+                    ->label(trans('dash.containers_count'))
+                    ->numeric()
+                    ->columnSpanFull()
+                    ->required(),  
             ]),
             // ViewField::make('accept_contact')
             //     ->required()
@@ -259,7 +263,7 @@ class QuotaResource extends Resource
                             ->id('discussion-section')
                             ->schema([
                                     
-                                    ViewEntry::make('discussion.messages')->label(trans('dash.quota_discussion'))->view('infolists.components.view-quota-discussion'),
+                                    ViewEntry::make('discussion')->label(trans('dash.quota_discussion'))->view('infolists.components.view-quota-discussion'),
 
                         
                             ]),

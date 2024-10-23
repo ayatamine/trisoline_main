@@ -126,8 +126,8 @@ class QuotaForm extends Component implements HasForms
                                 ->label(trans('dash.name'))
                                 ->columnSpan([
                                     'default' => 'full',
-                                    'md' => 2,
-                                    '2xl' => 1,
+                                    'sm' => 2,
+                                    // '2xl' => 1,
                                 ])
                                 ->required(),
                             TextInput::make('expected_price')
@@ -135,7 +135,7 @@ class QuotaForm extends Component implements HasForms
                                 ->numeric()
                                 ->columnSpan([
                                     'default' => 'full',
-                                    'md' => 1,
+                                    'sm' => 1,
                                 ])
                                 ->required(),
                             TextInput::make('quantity')
@@ -143,9 +143,10 @@ class QuotaForm extends Component implements HasForms
                                 ->numeric()
                                 ->columnSpan([
                                     'default' => 'full',
-                                    'md' => 1,
+                                    'sm' => 1,
                                 ])
                                 ->required(),
+                            
                             FileUpload::make(name: 'images')
                                 ->label(trans('dash.image'))
                                 ->image()
@@ -160,8 +161,13 @@ class QuotaForm extends Component implements HasForms
                         ->minItems(1)
                         ->defaultItems(1)
                         ->cloneable(),
-                        
+                        TextInput::make('containers_count')
+                        ->label(trans('dash.containers_count'))
+                        ->numeric()
+                        ->columnSpanFull()
+                        ->required(),    
                 ]),
+                
                 ViewField::make('accept_contact')
                     ->required()
                     ->view('forms.components.contract-condition')

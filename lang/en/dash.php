@@ -47,7 +47,9 @@ return [
      'created_at' => 'created at',
      'rejection_note' => 'Rejection Note',
      'quota_discussion' => 'Quota Discussion',
+     'order_discussion' => 'Order Discussion',
      'discussion_not_yet_started' => 'Discussion for this Quota is not opened yet, It Will be open when start processing',
+     'order_discussion_not_yet_started' => 'Discussion for this Order is not opened yet, It Will be open when start processing',
      'you' => 'You',
      'moderator' => 'Moderator',
      'send' => 'send',
@@ -59,6 +61,9 @@ return [
      'reopen_discussion' => 'reopen Discussion',
      'discussion_reopened_successfully' => 'Discussion reopened Successfully',
      'updateStatus' => 'update Status',
+     'status_updated_successfully' => 'status updated successfully',
+     'clients_area' => "Clients Area",
+     'client' => "Client",
 
      
     'home' => 'Home',
@@ -102,6 +107,7 @@ return [
     'order_info' => 'Order Infor',
     'products_info' => 'Products',
     'quantity' => 'Quantity',
+    'containers_count' => 'Number of containers',
     'description' => 'Description',
     'thumbnail' => 'Thumbnail',
     'seller_info' => 'Seller Information ',
@@ -151,4 +157,6 @@ return [
     'complaint_id' => 'Complaint Number',
     'assigned_to' => 'Assigned To',
     'symbol' => 'Symbol',
+    'expected_delivery_date' => 'Expected Delivery Date',
+    'real_delivery_date' => 'Real Delivery Date',
 ];

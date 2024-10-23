@@ -10,6 +10,7 @@ use App\Models\ShippingAddress;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -36,6 +37,11 @@ class Order extends Model
         'shipping_address_id',
         'currency_id',
         'vendor_info',
+        'containers_count',
+        'approved_at',
+        'inspected_at',
+        'completed_at',
+        'refuned_at',
     ];
 
     /**
@@ -124,5 +130,9 @@ class Order extends Model
     public function products(): HasMany
     {
         return $this->hasMany(Product::class,'order_id','id');
+    }
+    public function discussion(): HasOne
+    {
+        return $this->hasOne(Discussion::class,'discussable_id','id');
     }
 }

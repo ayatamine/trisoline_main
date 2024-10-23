@@ -43,3 +43,6 @@
     max-height: 200px;
     overflow-y: scroll;
 }
+.error{
+    color: rgb(225, 34, 34);
+}

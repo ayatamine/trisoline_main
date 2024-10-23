@@ -5,7 +5,7 @@
 
         @if(!$getState()) 
         <div class="bg-blue-300 text-white w-full p-2 rounded">
-            {{trans('dash.discussion_not_yet_started')}}
+            {{trans('dash.order_discussion_not_yet_started')}}
         </div>
         @else
         @if($getRecord()?->discussion?->is_open)
@@ -74,7 +74,7 @@
                 <form action="">
                     <div class="flex items-start justify-between gap-3">
                         <div class=" w-50">
-                            <textarea wire:model="content" class="flex items-center  rounded px-3 text-sm w-full" type="text" rows="5"></textarea>
+                            <textarea wire:model="content" class="flex items-center  rounded px-3 text-sm w-full" type="text" rows="5" required></textarea>
                             <div>
                                 @error('content') <span class="error">{{ $message }}</span> @enderror
                             </div>

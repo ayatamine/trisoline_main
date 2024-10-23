@@ -1,44 +1,33 @@
 <?php
 
-namespace App\Filament\Client\Resources\OrderResource\Pages;
+namespace App\Filament\Admin\Resources\OrderResource\Pages;
 
 use App\Models\File;
 use Filament\Actions;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
-use Filament\Resources\Pages\EditRecord;
-use App\Filament\Client\Resources\OrderResource;
+use Filament\Resources\Pages\CreateRecord;
+use App\Filament\Admin\Resources\OrderResource;
 
-class EditOrder extends EditRecord
+class CreateOrder extends CreateRecord
 {
     protected static string $resource = OrderResource::class;
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            Actions\ViewAction::make(),
-            Actions\DeleteAction::make(),
-        ];
-    }
-    public function mutateFormDataBeforeFill(array $data): array
-    {
-
-        $data['products_info'] = $this->record->products;
-        return $data;
-    }
-
-
-    protected function handleRecordUpdate(Model $record, array $data): Model
+    // public function mutateFormDataBeforeCreate(array $data): array
+    // {
+    //     return $data;
+    // }
+    protected function handleRecordCreation(array $data): Model
     {
       
         try{
-
             DB::beginTransaction();
+            $result = static::getModel()::create($data);
+  
+            
             if($data['products_info'])
             {
                 
-                $record->products()->delete();
                 foreach ($data['products_info'] as $p) {
                     $product = new Product;
                     $product->name = $p['name'];
@@ -46,7 +35,7 @@ class EditOrder extends EditRecord
                     $product->expected_price = $p['price'];
                     $product->quantity = $p['quantity'];
                     $product->description = $p['description'];
-                    // $product->thumbnail = $p['thumbnail'];
+                   
                     if($p['images'] &&  count($p['images'])){
                         $product->thumbnail = $p['images'][0];
                         $product->save();
@@ -54,7 +43,7 @@ class EditOrder extends EditRecord
                         foreach($p['images'] as $file)
                         {
                             $albumFile = new File();
-                            $albumFile->fileable_id = $product['id'];
+                            $albumFile->fileable_id = $p->id;
                             $albumFile->fileable_type = Product::class;
                             $albumFile->type = 'image';
                             $albumFile->file = $file;
@@ -65,20 +54,19 @@ class EditOrder extends EditRecord
                         $product->thumbnail = 'products/product.png';
                         $product->save();
                     }
+                    $product->save();
 
-                    $record->products()->save($product);
                    
                 }
             }
             DB::commit();
             
-            $record->update($data);
         }
         catch(\Exception $ex)
         {
             DB::rollBack();
             throw $ex;
         }
-        return $record;
+        return $result;
     }
 }

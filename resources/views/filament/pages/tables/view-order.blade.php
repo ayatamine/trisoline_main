@@ -28,6 +28,12 @@
              <div class="md:flex items-center justify-start gap-8 text-gray-900 dark:text-white w-full py-5 px-6">
                 <span><strong> {{trans('dash.order_date')}} : </strong> {{$order->created_at}}</span>
              </div>
+             <div class="md:flex items-center justify-start gap-8 text-gray-900 dark:text-white w-full py-5 px-6">
+                <span><strong> {{trans('dash.status')}} : </strong></span> 
+                <x-filament::badge size="xl"     :color="$order->payment_status =='refunded' ?  'danger' : 'primary'" >
+                  {{$order->status}}
+              </x-filament::badge>
+             </div>
              {{-- <a href="contact.html" class="text-primary-600 text-sm underline">{{trans('dash.Expected_Delivery_Date')}}</a> --}}
         </div>
         <div class="bg-white pb-4 antialiased dark:bg-gray-900 ">
@@ -36,7 +42,7 @@
           
                 
           
-                <div class="mt-6 sm:mt-8 w-full lg:w-2/3 border rounded-lg">
+                <div class="mt-6 sm:mt-8 w-full md:w-80 border rounded-lg">
                   <div class="relative overflow-x-auto border-b border-gray-200 dark:border-gray-800">
                     <table class="w-full text-left font-medium text-gray-900 dark:text-white md:table-fixed">
                       <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
@@ -84,7 +90,14 @@
                           <dt class="text-gray-500 dark:text-gray-400">{{trans('dash.Handling_Service')}}</dt>
                           <dd class="text-base font-medium text-gray-900 dark:text-white">{{$order->currency->symbol}} 0</dd>
                         </dl>
-          
+                        <div class="space-y-4 border-gray-200 py-8 dark:border-gray-700 rounded-lg ">
+                          <h4 class="text-lg font-semibold text-gray-900 dark:text-white">{{trans('dash.billing_delivery')}}</h4>
+                  
+                          <dl>
+                            
+                            <dd class="mt-1 text-base font-normal text-gray-500 dark:text-gray-400">{{$order->shippingAddress->full_address}}</dd>
+                          </dl>
+                        </div>
                       </div>
           
                       
@@ -93,36 +106,6 @@
               
            
                   </div>
-                </div>
-                <div class="mt-6 space-y-4 border-gray-200  dark:border-gray-700 sm:mt-8 w-full lg:w-1/3">
-                    <div class="space-y-4 border-gray-200 py-8 dark:border-gray-700 rounded-lg border p-4">
-                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white">{{trans('dash.billing_delivery')}}</h4>
-                
-                        <dl>
-                          
-                          <dt class="text-base font-medium text-gray-900 dark:text-white">{{trans('dash.individual')}}</dt>
-                          <dd class="mt-1 text-base font-normal text-gray-500 dark:text-gray-400">{{$order->shippingAddress->full_address}}</dd>
-                        </dl>
-                        @if($order->status == 'pending')
-                        <x-filament::button color="info"
-                            wire:click="mountAction('updateShippingAddress', { id: {{$order->id}} })"
-                            >
-                            {{trans('dash.edit_shipping_address')}}
-                        </x-filament::button>
-                        @endif
-                        {{-- <button type="button" data-modal-target="billingInformationModal{{$order->id}}" data-modal-toggle="billingInformationModal{{$order->id}}" class="text-base font-medium text-primary-700 hover:underline dark:text-primary-500">{{trans('dash.edit')}}</button> --}}
-                    </div>
-                    <div class="mt-6 space-y-4 border-gray-200 py-8 dark:border-gray-700 rounded-lg border p-4 gap-4 sm:flex sm:items-center">
-                           {{-- @if($order->status == "pending")
-                            <x-filament::button class="success @if($order->status == 'pending') w-full @endif" wire:click="openNewUserModal" >
-                                    {{trans('dash.contact_support')}}
-                                </x-filament::button>
-                               <a  href="{{route('orders.edit',[$order->id])}}" class="w-full rounded-3xl px-5 text-center  py-2.5 text-sm text-white font-medium bg-body-secondary hover:bg-body-secondary focus:z-10 focus:outline-none focus:ring-4 focus:ring-red-200 w-auto">{{trans('dash.edit')}}</a>
-                            @endif --}}
-                            <x-filament::button class="@if($order->status == 'pending') w-full @endif"  >
-                                {{trans('dash.contact_support')}}
-                            </x-filament::button>
-                    </div>
                 </div>
               </div>
             </form>

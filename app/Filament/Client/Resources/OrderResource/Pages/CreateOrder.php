@@ -2,6 +2,7 @@
 
 namespace App\Filament\Client\Resources\OrderResource\Pages;
 
+use App\Models\File;
 use Filament\Actions;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
@@ -21,9 +22,10 @@ class CreateOrder extends CreateRecord
     {
       
         try{
-            $result = static::getModel()::create($data);
-        
             DB::beginTransaction();
+            $result = static::getModel()::create($data);
+  
+            
             if($data['products_info'])
             {
                 
@@ -34,7 +36,25 @@ class CreateOrder extends CreateRecord
                     $product->expected_price = $p['price'];
                     $product->quantity = $p['quantity'];
                     $product->description = $p['description'];
-                    $product->thumbnail = $p['thumbnail'];
+                   
+                    if($p['images'] &&  count($p['images'])){
+                        $product->thumbnail = $p['images'][0];
+                        $product->save();
+                        //save the last of images
+                        foreach($p['images'] as $file)
+                        {
+                            $albumFile = new File();
+                            $albumFile->fileable_id = $p->id;
+                            $albumFile->fileable_type = Product::class;
+                            $albumFile->type = 'image';
+                            $albumFile->file = $file;
+                            $albumFile->save();
+
+                        }
+                    }else{
+                        $product->thumbnail = 'products/product.png';
+                        $product->save();
+                    }
                     $product->save();
 
                    

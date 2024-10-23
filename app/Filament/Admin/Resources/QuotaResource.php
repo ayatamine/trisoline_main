@@ -39,7 +39,10 @@ class QuotaResource extends Resource
     protected static ?string $model = Quota::class;
 
     protected static ?string $navigationIcon = 'icon-quotations';
-
+    public static  function getNavigationGroup():string
+    {
+            return trans('dash.clients_area');
+    }
     public static function form(Form $form): Form
     {
         return $form
@@ -151,6 +154,11 @@ class QuotaResource extends Resource
                     ->cloneable(),
                     
             ]),
+            TextInput::make('containers_count')
+            ->label(trans('dash.containers_count'))
+            ->numeric()
+            ->columnSpanFull()
+            ->required(),  
             // ViewField::make('accept_contact')
             //     ->required()
             //     ->view('forms.components.contract-condition')
@@ -231,6 +239,7 @@ class QuotaResource extends Resource
                 ->action(function (array $data,Quota $record): void {
                     if($data['status'] == "processing") 
                     {
+                        if(!$record->discussion) $record->discussion->create(['discussable_type'=>Quota::class,'discussable_id'=>$record->id,'is_open'=>1]);
                         $data['rejected_at'] = null;
                         $data['processed_at'] = null;
                         $data['processing_at'] = now();
@@ -243,7 +252,7 @@ class QuotaResource extends Resource
                     }
                     $record->update($data);
                     Notification::make()
-                    ->title(trans('dash.discussion_closed_successfully'))
+                    ->title(trans('dash.status_updated_successfully'))
                     ->icon('heroicon-o-document-text')
                     ->iconColor('success')
                     ->send();

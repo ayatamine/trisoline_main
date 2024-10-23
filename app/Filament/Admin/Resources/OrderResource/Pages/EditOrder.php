@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Client\Resources\OrderResource\Pages;
+namespace App\Filament\Admin\Resources\OrderResource\Pages;
 
 use App\Models\File;
 use Filament\Actions;
@@ -8,7 +8,7 @@ use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Resources\Pages\EditRecord;
-use App\Filament\Client\Resources\OrderResource;
+use App\Filament\Admin\Resources\OrderResource;
 
 class EditOrder extends EditRecord
 {
@@ -17,7 +17,7 @@ class EditOrder extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make(),
+            Actions\DeleteAction::make(),
             Actions\DeleteAction::make(),
         ];
     }
