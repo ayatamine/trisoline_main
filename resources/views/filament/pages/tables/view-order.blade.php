@@ -34,6 +34,12 @@
                   {{$order->status}}
               </x-filament::badge>
              </div>
+             <div class="md:flex items-center justify-start gap-8 text-gray-900 dark:text-white w-full py-5 px-6">
+                <span><strong> {{trans('dash.containers_count')}} : </strong></span> 
+                <x-filament::badge size="xl"     :color="'success'" >
+                  {{$order->containers_count}}
+              </x-filament::badge>
+             </div>
              {{-- <a href="contact.html" class="text-primary-600 text-sm underline">{{trans('dash.Expected_Delivery_Date')}}</a> --}}
         </div>
         <div class="bg-white pb-4 antialiased dark:bg-gray-900 ">

@@ -146,12 +146,29 @@ class QuotaResource extends Resource
                     ->minItems(1)
                     ->defaultItems(1)
                     ->cloneable(),
-                    TextInput::make('containers_count')
+                    Repeater::make('containers')
+                    ->required()
                     ->label(trans('dash.containers_count'))
-                    ->numeric()
                     ->columnSpanFull()
-                    ->required(),  
+                    ->required()
+                    ->schema(components: [
+                        Grid::make('')
+                            ->columns(2)
+                            ->schema([
+                                Forms\Components\Select::make('type')
+                                ->label(trans('dash.container_type'))
+                                ->options(
+                                    ['big_container'=>trans('dash.big_container'),'medium_container'=>trans('dash.medium_container'),'small_container'=>trans('dash.small_container')]
+                                )
+                                ->required(),
+                                Forms\Components\TextInput::make('count')
+                                    ->label(trans('dash.containers_count'))
+                                    ->numeric()
+                                    ->required(),
+                            ])
+                    ]),
             ]),
+            
             // ViewField::make('accept_contact')
             //     ->required()
             //     ->view('forms.components.contract-condition')
@@ -242,6 +259,7 @@ class QuotaResource extends Resource
                                 TextEntry::make('status')->label(trans('dash.status'))->weight(FontWeight::Bold),
                                 TextEntry::make('rejection_note')->label(trans('dash.rejection_note'))->weight(FontWeight::Bold),
                                 TextEntry::make('created_at')->label(trans('dash.created_at'))->date()->weight(FontWeight::Bold),
+                                ViewEntry::make('containers')->label(trans('dash.containers_count'))->view('infolists.components.containers-count'),
                         ]),
                     \Filament\Infolists\Components\Section::make(trans('dash.products_info'))
                         ->id('products_info-section')

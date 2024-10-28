@@ -11,7 +11,9 @@ use Livewire\Component;
 use Filament\Forms\Form;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\HtmlString;
 use Filament\Forms\Components\Grid;
+use Filament\Support\Enums\IconSize;
 use Illuminate\Support\Facades\Http;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
@@ -25,6 +27,7 @@ use Filament\Forms\Components\ViewField;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\FileUpload;
 use App\Forms\Components\ContractCondition;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Concerns\InteractsWithForms;
 
 class QuotaForm extends Component implements HasForms
@@ -85,13 +88,29 @@ class QuotaForm extends Component implements HasForms
                 TextInput::make('tax_number')
                     ->label(trans('dash.tax_number')),
                 Grid::make()
-                    ->columns(3)
+                    ->columns([
+                        'default' => 'full',
+                        'md' => 3,
+                        'lg' => 3,
+                        'xl' => 3,
+                    ])
                     ->schema([
                         TextInput::make('available_budget')
                         ->numeric()
-                        ->columnSpan(2)
+                        ->columnSpan([
+                            'default' => 'full',
+                            'md' => 2,
+                            'lg' => 2,
+                            'xl' => 2,
+                        ])
                         ->label(trans('dash.available_budget')),
                         Select::make('currency')->label(trans('dash.currency'))
+                        ->columnSpan([
+                            'default' => 'full',
+                            'md' => 1,
+                            'lg' => 1,
+                            'xl' => 1,
+                        ])
                         // ->searchable()
                         ->options(['USD'=>'USD','EUR'=>'EUR','SAR'=>'SAR','CNY'=>'CNY']),
                     ]),
@@ -161,17 +180,45 @@ class QuotaForm extends Component implements HasForms
                         ->minItems(1)
                         ->defaultItems(1)
                         ->cloneable(),
-                        TextInput::make('containers_count')
+                        Repeater::make('containers')
+                        ->required()
                         ->label(trans('dash.containers_count'))
-                        ->numeric()
                         ->columnSpanFull()
-                        ->required(),    
+                        ->required()
+                        ->schema(components: [
+                            Grid::make('')
+                                ->columns(2)
+                                ->schema([
+                                    Select::make('type')
+                                    ->label(trans('dash.container_type'))
+                                    ->options(
+                                        ['big_container'=>trans('dash.big_container'),'medium_container'=>trans('dash.medium_container'),'small_container'=>trans('dash.small_container')]
+                                    )
+                                    ->required(),
+                                    TextInput::make('count')
+                                        ->label(trans('dash.containers_count'))
+                                        ->numeric()
+                                        ->required(),
+                                ])
+                        ]),    
                 ]),
-                
-                ViewField::make('accept_contact')
-                    ->required()
-                    ->view('forms.components.contract-condition')
-            ])
+
+                // ViewField::make('accept_contract')
+                //     ->required()
+                //     ->view('forms.components.contract-condition')
+                Checkbox::make('terms')
+                ->label(fn() => trans('dash.accept_contract_title'))
+                ->hintAction(
+                    Action::make(trans('dash.accept_contract_title'))
+                        ->hiddenLabel(false)
+                        ->icon('heroicon-o-information-circle')
+                        ->iconSize(IconSize::Large)
+                        ->tooltip(trans('dash.accept_contract_title'))
+                        ->url(route('quotation_terms'))
+                        ->openUrlInNewTab()
+                )
+                ->required()
+                ])
             ])
             ->statePath('data');
     }
@@ -181,8 +228,9 @@ class QuotaForm extends Component implements HasForms
 
         try{
             DB::beginTransaction(); 
-           $data = $this->form->getState();
-           $client=null; $quota = null;
+            $data = $this->data;
+            $this->validate();
+            $client=null; $quota = null;
             if($this->register_account)
             {
                 $password  = Str::random(8);
@@ -192,13 +240,43 @@ class QuotaForm extends Component implements HasForms
                     'password'=>$password
                 ]);
                 $client = Client::create([ 'user_id'=>$user->id]);
-                $products =$data['products'];
+                $products =$data['products'] ?? [];
+                $data['containers'] = array_values($data['containers']) ?? [];
                 unset($data['products']);
                 $data['client_id'] = $client->id;
                 $quota = Quota::create($data);
                 if(count($products))
                 {
-                    foreach($products as $product)
+                    $this->attachProducts($quota,$products);
+                }
+            }else{
+                $products =$data['products'] ??  [];
+                unset($data['products']);
+                $data['containers'] = array_values($data['containers']) ?? [];
+                $quota = Quota::create($data);
+            }
+           
+            
+
+             
+            DB::commit();
+             $this->form->fill();
+             $this->is_success =true;
+            Notification::make() 
+            ->title(trans('dash.creation_success',['model'=>trans_choice('dash.quota',1)]))
+            ->success()
+            ->send();
+            
+        } 
+        catch(\Exception $ex)
+        {
+            DB::rollBack();
+            throw $ex;
+        }
+    }
+    public function attachProducts(Quota $quota,array $products)
+    {
+        foreach($products as $product)
                     {
                       
                         $new_product = new Product;
@@ -208,7 +286,7 @@ class QuotaForm extends Component implements HasForms
                         $new_product->quantity = $product['quantity'];
                         $new_product->description = $product['description'];
                         if($product['images'] &&  count($product['images'])){
-                            $new_product->thumbnail = $product['images'][0];
+                            $new_product->thumbnail = $product['images'][0] ?? "product.png";
                             $new_product->save();
                             //save the last of images
                             foreach($product['images'] as $file)
@@ -230,29 +308,8 @@ class QuotaForm extends Component implements HasForms
     
                         $quota->products()->save($new_product);
                     }
-                }
-            }else{
-                $quota = Quota::create($data);
-            }
-           
-            
-
-           
-            DB::commit();
-             $this->form->fill();
-             $this->is_success =true;
-            Notification::make()
-            ->title(trans('dash.creation_success',['model'=>trans_choice('dash.quota',1)]))
-            ->success()
-            ->send();
-            
-        } 
-        catch(\Exception $ex)
-        {
-            DB::rollBack();
-            throw $ex;
-        }
     }
+
     public function createWithAccount()
     {
         $this->register_account =true;

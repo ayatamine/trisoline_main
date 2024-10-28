@@ -11,9 +11,11 @@ use Filament\Tables\Table;
 use App\Models\ShippingAddress;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Grid;
 use Illuminate\Support\Facades\Http;
 use Filament\Forms\Components\Section;
 use Filament\Support\Enums\FontWeight;
+use Filament\Forms\Components\Repeater;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\Layout\View;
@@ -123,11 +125,27 @@ class OrderResource extends Resource
                             ])
                          ])
                 ]),
-                Forms\Components\TextInput::make('containers_count')
-                ->label(trans('dash.containers_count'))
-                ->numeric()
-                ->columnSpanFull()
-                ->required(),  
+                Repeater::make('containers')
+                    ->required()
+                    ->label(trans('dash.containers_count'))
+                    ->columnSpanFull()
+                    ->required()
+                    ->schema(components: [
+                        Grid::make('')
+                            ->columns(2)
+                            ->schema([
+                                Forms\Components\Select::make('type')
+                                ->label(trans('dash.container_type'))
+                                ->options(
+                                    ['big_container'=>trans('dash.big_container'),'medium_container'=>trans('dash.medium_container'),'small_container'=>trans('dash.small_container')]
+                                )
+                                ->required(),
+                                Forms\Components\TextInput::make('count')
+                                    ->label(trans('dash.containers_count'))
+                                    ->numeric()
+                                    ->required(),
+                            ])
+                    ]), 
             ]);
     }
 
@@ -191,7 +209,7 @@ class OrderResource extends Resource
     {
         return $infolist
             ->schema([
-                    \Filament\Infolists\Components\Section::make(trans('dash.quota_info'))
+                    \Filament\Infolists\Components\Section::make(trans('dash.order_info'))
                         ->headerActions([
                             // Action::make(trans('dash.edit'))
                             //     ->url(fn (Student $record): string => route('filament.admin.resources.students.edit', $record))
@@ -214,6 +232,7 @@ class OrderResource extends Resource
                                 ->hidden(fn(Order $order)=> $order->rejection_note == null)
                                 ->weight(FontWeight::Bold),
                                 TextEntry::make('created_at')->label(trans('dash.created_at'))->date()->weight(FontWeight::Bold),
+                                ViewEntry::make('containers')->label(trans('dash.containers_count'))->view('infolists.components.containers-count'),
                         ]),
                     \Filament\Infolists\Components\Section::make(trans('dash.products_info'))
                         ->id('products_info-section')

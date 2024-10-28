@@ -18,6 +18,9 @@
 .bg-blue-300{
     background-color: rgb(60, 151, 212);
 }
+.text-blue-500{
+    color: rgb(23, 103, 157);
+}
 .min-h-43{    min-height: 43rem;}
 .rounded-l-xl{border-top-left-radius: 0.75rem; /* 12px */
     border-bottom-left-radius: 0.75rem; /* 12px */}

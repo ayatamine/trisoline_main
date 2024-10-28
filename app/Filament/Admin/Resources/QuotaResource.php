@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Filament\Actions\Concerns\HasInfolist;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ViewEntry;
+use Filament\Infolists\Components\KeyValueEntry;
 use Filament\Infolists\Components\Actions\Action;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Admin\Resources\QuotaResource\Pages;
@@ -154,11 +155,27 @@ class QuotaResource extends Resource
                     ->cloneable(),
                     
             ]),
-            TextInput::make('containers_count')
+            Repeater::make('containers')
+            ->required()
             ->label(trans('dash.containers_count'))
-            ->numeric()
             ->columnSpanFull()
-            ->required(),  
+            ->required()
+            ->schema(components: [
+                Grid::make('')
+                    ->columns(2)
+                    ->schema([
+                        Select::make('type')
+                        ->label(trans('dash.container_type'))
+                        ->options(
+                            ['big_container'=>trans('dash.big_container'),'medium_container'=>trans('dash.medium_container'),'small_container'=>trans('dash.small_container')]
+                        )
+                        ->required(),
+                        TextInput::make('count')
+                            ->label(trans('dash.containers_count'))
+                            ->numeric()
+                            ->required(),
+                    ])
+            ]),
             // ViewField::make('accept_contact')
             //     ->required()
             //     ->view('forms.components.contract-condition')
@@ -171,6 +188,12 @@ class QuotaResource extends Resource
      
         return $table
             ->columns([
+                TextColumn::make('client_id')->label(trans('dash.type'))
+                    ->formatStateUsing(fn(Quota $quota):string => $quota->client_id!=0  ? trans("dash.client") : trans('dash.guest'))
+                    ->sortable(),
+                TextColumn::make('id')->label(trans_choice('dash.id',1))
+                ->formatStateUsing(fn(string $state)=>"#$state")
+                ->searchable()->sortable(),
                 TextColumn::make('business_name')->label(trans_choice('dash.name',1))->sortable()->searchable(),
                 TextColumn::make('legal_representative_name')->label(trans_choice('dash.legal_representative_name',1))->sortable()->searchable(),
                 TextColumn::make('country')->label(trans('dash.country'))->searchable()->sortable()->searchable(),
@@ -193,12 +216,29 @@ class QuotaResource extends Resource
                                             'rejected' => 'danger',
                             })
                             ->formatStateUsing(fn(string $state)=> trans("dash.$state")),
+                TextColumn::make('created_at')->label(trans('dash.created_at'))->date()->sortable(),
             ])
             ->filters([
-                SelectFilter::make('service_type')->label(trans('dash.service_type'))->options([
-                    'trade' => trans('dash.trade'),
-                    'real_estate' => trans('dash.real_estate')
-                ]),
+                Filter::make('type')
+                    ->label(trans('dash.type'))
+                    ->form([
+                        Select::make('type')->label(trans('dash.type'))
+                        ->options([
+                            'guest' => trans('dash.guest'),
+                            'client' => trans('dash.client')
+                        ]),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['type'] == "guest",
+                                fn (Builder $query, $d): Builder => $query->whereNull('client_id')
+                            )
+                            ->when(
+                                $data['type'] =="client",
+                                fn (Builder $query, $to): Builder => $query->whereNotNull('client_id')
+                            );
+                    }),
                 SelectFilter::make('status')->label(trans('dash.status'))->options([
                     'pending' => trans('dash.pending'),
                     'processing' => trans('dash.processing'),
@@ -295,16 +335,15 @@ class QuotaResource extends Resource
                                 TextEntry::make( 'email')->label(trans('dash.email'))->weight(FontWeight::Bold),
                                 TextEntry::make('available_budget')->label(trans('dash.available_budget'))->weight(FontWeight::Bold),
                                 TextEntry::make('currency')->label(trans('dash.currency'))->weight(FontWeight::Bold),
-                                TextEntry::make('status')->label(trans('dash.status'))->weight(FontWeight::Bold),
                                 TextEntry::make('rejection_note')->label(trans('dash.rejection_note'))->weight(FontWeight::Bold),
                                 TextEntry::make('created_at')->label(trans('dash.created_at'))->date()->weight(FontWeight::Bold),
+                                ViewEntry::make('containers')->label(trans('dash.containers_count'))->view('infolists.components.containers-count'),
                         ]),
                     \Filament\Infolists\Components\Section::make(trans('dash.products_info'))
                         ->id('products_info-section')
                         ->schema([
                                 
                                 ViewEntry::make('products')->label(trans('dash.products_info'))->view('infolists.components.view-product'),
-
                     
                         ]),
                     \Filament\Infolists\Components\Section::make(trans('dash.status'))
@@ -312,7 +351,6 @@ class QuotaResource extends Resource
                             ->schema([
                                     
                                     ViewEntry::make('status')->label(trans('dash.quota_status'))->view('infolists.components.view-quota-status'),
-
                         
                             ]),
                   
@@ -320,7 +358,7 @@ class QuotaResource extends Resource
                             ->id('discussion-section')
                             ->schema([
                                     
-                                    ViewEntry::make('discussion.messages')->label(trans('dash.quota_discussion'))->view('infolists.components.view-quota-discussion')
+                                    ViewEntry::make('discussion')->label(trans('dash.quota_discussion'))->view('infolists.components.view-quota-discussion')
                                     ->registerActions([
                                         Action::make('closeDiscussion')
                                             ->label(trans('dash.close_discussion'))

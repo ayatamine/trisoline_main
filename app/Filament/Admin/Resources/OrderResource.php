@@ -11,22 +11,31 @@ use App\Models\Currency;
 use Filament\Forms\Form;
 use App\Models\Discussion;
 use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
+use Filament\Support\Enums\FontWeight;
+use Filament\Forms\Components\Repeater;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\Layout\View;
 use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ViewEntry;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Admin\Resources\OrderResource\Pages;
+use Filament\Infolists\Components\TextEntry\TextEntrySize;
 use App\Filament\Admin\Resources\OrderResource\RelationManagers;
 
 class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
+    protected static ?int $sort = 6;
 
     protected static ?string $navigationIcon = 'icon-orders';
     public  static function getNavigationGroup():string
@@ -94,11 +103,27 @@ class OrderResource extends Resource
                         ])
                      ])
             ]),
-            Forms\Components\TextInput::make('containers_count')
+            Repeater::make('containers')
+            ->required()
             ->label(trans('dash.containers_count'))
-            ->numeric()
             ->columnSpanFull()
-            ->required(),  
+            ->required()
+            ->schema(components: [
+                Grid::make('')
+                    ->columns(2)
+                    ->schema([
+                        Select::make('type')
+                        ->label(trans('dash.container_type'))
+                        ->options(
+                            ['big_container'=>trans('dash.big_container'),'medium_container'=>trans('dash.medium_container'),'small_container'=>trans('dash.small_container')]
+                        )
+                        ->required(),
+                        TextInput::make('count')
+                            ->label(trans('dash.containers_count'))
+                            ->numeric()
+                            ->required(),
+                    ])
+            ]),
         ]);
     }
 
@@ -110,9 +135,9 @@ class OrderResource extends Resource
                 'xl' => 2,
             ])
             ->columns([
-                Stack::make([
-                    TextColumn::make('name')->label(trans('dash.name'))->searchable(),
-                    TextColumn::make('created_at')->label(trans('dash.order_date'))->searchable()->sortable(),
+                // Stack::make([
+                //     TextColumn::make('name')->label(trans('dash.name'))->searchable(),
+                //     TextColumn::make('created_at')->label(trans('dash.order_date'))->searchable()->sortable(),
                     // TextColumn::make('currency.symbol')->label(trans('dash.currency')),
                     // TextColumn::make('status')->label(trans('dash.status'))
                     //         ->badge()
@@ -131,7 +156,7 @@ class OrderResource extends Resource
                     //             'Paid' => 'success',
                     //             'Not Paid' => 'warning',
                     //         })
-                ]),
+                // ]),
                 View::make('filament.pages.tables.view-order'),
                 
                 // TextColumn::make('count(payments)')->label(trans('dash.payments'))
@@ -192,6 +217,82 @@ class OrderResource extends Resource
             ])
            ;
     }
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                    \Filament\Infolists\Components\Section::make(trans('dash.order_info'))
+                        ->headerActions([
+                            // Action::make(trans('dash.edit'))
+                            //     ->url(fn (Student $record): string => route('filament.admin.resources.students.edit', $record))
+                        ])
+                        ->columns(2)
+                        ->id('main-section')
+                        ->schema([
+
+
+                                TextEntry::make('name')->label(trans('dash.name'))->weight(FontWeight::Bold),
+                                TextEntry::make( 'client.user.email')->label(trans('dash.email'))->weight(FontWeight::Bold),
+
+                                TextEntry::make('expected_delivery_date')->label(trans('dash.expected_delivery_date'))->weight(FontWeight::Bold),
+                                TextEntry::make('real_delivery_date')->label(trans('dash.real_delivery_date'))->weight(FontWeight::Bold),
+                                TextEntry::make( 'shippingAddress.full_address')->label(trans('dash.address'))->weight(FontWeight::Bold),
+                                TextEntry::make('containers_count')->label(trans('dash.containers_count'))
+                                ->color('success')
+                                ->size(TextEntrySize::Large)
+                                ->weight(FontWeight::Bold),
+                                TextEntry::make('currency.name')->label(trans('dash.currency'))->weight(FontWeight::Bold),
+                                
+                                TextEntry::make('status')->label(trans('dash.status'))->weight(FontWeight::Bold)
+                                ->color('success')
+                                ->size(TextEntrySize::Large),
+                                TextEntry::make(name: 'rejection_note')->label(trans('dash.rejection_note'))
+                                ->hidden(fn(Order $order)=> $order->rejection_note == null)
+                                ->weight(FontWeight::Bold),
+                                TextEntry::make('created_at')->label(trans('dash.created_at'))->date()->weight(FontWeight::Bold),
+                                ViewEntry::make('containers')->label(trans('dash.containers_count'))->view('infolists.components.containers-count'),
+                        ]),
+                    \Filament\Infolists\Components\Section::make(trans('dash.products_info'))
+                        ->id('products_info-section')
+                        ->schema([
+                                
+                                ViewEntry::make('products')->label(trans('dash.products_info'))->view('infolists.components.view-order-product'),
+
+                    
+                        ]),
+                    \Filament\Infolists\Components\Section::make(trans('dash.status'))
+                            ->id('status-section')
+                            ->schema([
+                                    
+                                    ViewEntry::make('status')->label(trans('dash.quota_status'))->view('infolists.components.view-order-status'),
+
+                        
+                            ]),
+                    \Filament\Infolists\Components\Section::make(trans('dash.order_discussion'))
+                            ->id('discussion-section')
+                            ->schema([
+                                    
+                                    ViewEntry::make('discussion')->label(trans('dash.order_discussion'))->view('infolists.components.view-order-discussion'),
+
+                        
+                            ]),
+                // \Filament\Infolists\Components\Section::make(trans('dash.account_ballance'))
+                //         ->columns(2)
+                //         ->id('account_ballance-section')
+                //         ->schema([
+                //                 TextEntry::make('balance')->label(trans('dash.account_ballance_actual'))
+                //                 ->color('primary')
+                //                 ->size(TextEntry\TextEntrySize::Large)
+                //                 ->weight(FontWeight::Bold)
+                //                 ->tooltip(function (TextEntry $component): ?string {
+                                    
+                //                     return trans('dash.balance_calculate_method');
+                //                 })
+                       
+                //         ]),
+                       
+            ]);
+    }
 
     public static function getRelations(): array
     {
@@ -206,7 +307,7 @@ class OrderResource extends Resource
             'index' => Pages\ListOrders::route('/'),
             'create' => Pages\CreateOrder::route('/create'),
             'edit' => Pages\EditOrder::route('/{record}/edit'),
-            'view' => Pages\EditOrder::route('/{record}'),
+            'view' => Pages\ViewOrder::route('/{record}'),
         ];
     }
 }

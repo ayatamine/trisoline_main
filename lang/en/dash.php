@@ -34,7 +34,7 @@ return [
     'create_quota' => 'create_quota',
     'login' => 'Log in',
     'go_back' => 'Go Back',
-    'accept_contract_text' => 'By Checking this you are accepting our',
+    'accept_contract_text' => 'By Checking this you are accepting our contract & conditions',
     'accept_contract_title' => 'contract & conditions',
     
      'address' => 'Address',
@@ -64,6 +64,8 @@ return [
      'status_updated_successfully' => 'status updated successfully',
      'clients_area' => "Clients Area",
      'client' => "Client",
+     'guest' => "Guest",
+     'id' => "Number",
 
      
     'home' => 'Home',
@@ -108,7 +110,9 @@ return [
     'products_info' => 'Products',
     'quantity' => 'Quantity',
     'containers_count' => 'Number of containers',
+    'container_type' => 'Container Type',
     'description' => 'Description',
+    'container' => 'Container',
     'thumbnail' => 'Thumbnail',
     'seller_info' => 'Seller Information ',
     'update_success' => ':MODEL updated successfully',
@@ -159,4 +163,11 @@ return [
     'symbol' => 'Symbol',
     'expected_delivery_date' => 'Expected Delivery Date',
     'real_delivery_date' => 'Real Delivery Date',
+    'starts_at' => 'Starts At',
+    'ends_at' => 'Ends At',
+    'this_form_is_for_guest' => 'This page is only for guest clients, it is better to add a New Quota From you Account',
+    'go_to_dashboard' => 'My Dashboard',
+    'big_container' => 'Big(45)',
+    'medium_container' => 'Medium(40)',
+    'small_container' => 'Small(20)',
 ];

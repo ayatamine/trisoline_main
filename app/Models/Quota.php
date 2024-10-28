@@ -40,7 +40,8 @@ class Quota extends Model
         'client_id',
         'rejected_at',
         'processing_at',
-        'processed_at'
+        'processed_at',
+        'containers'
     ];
 
     /**
@@ -52,6 +53,7 @@ class Quota extends Model
         'id' => 'integer',
         'client_id' => 'integer',
         'is_customs_clearance_available' => 'bool',
+        'containers' => 'array',
     ];
     public function products(): HasMany
     {
@@ -65,5 +67,10 @@ class Quota extends Model
     {
         return $this->belongsTo(Client::class);
     }
+    public function getClientIdAttribute($attribute)
+    {
+        return $attribute ?? 0;
+    }
+
 
 }

@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('quotas', function (Blueprint $table) {
-            $table->unsignedInteger('containers_count')->nullable();
+            $table->mediumText('containers')->nullable();
         });
         Schema::table('orders', function (Blueprint $table) {
-            $table->unsignedInteger('containers_count')->nullable();
+            $table->mediumText('containers')->nullable();
         });
     }
 
@@ -25,10 +25,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('quotas', function (Blueprint $table) {
-           $table->dropColumn("containers_count");
+           $table->dropColumn("containers");
         });
         Schema::table('orders', function (Blueprint $table) {
-           $table->dropColumn("containers_count");
+           $table->dropColumn("containers");
         });
     }
 };

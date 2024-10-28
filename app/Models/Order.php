@@ -60,6 +60,7 @@ class Order extends Model
         'currency_id' => 'integer',
         'payment_status' => 'boolean',
         'vendor_info' => 'array',
+        'containers' => 'array',
     ];
     protected $hidden=['updated_at','deleted_at'];
     public function vendor(): BelongsTo
@@ -135,4 +136,5 @@ class Order extends Model
     {
         return $this->hasOne(Discussion::class,'discussable_id','id');
     }
+
 }

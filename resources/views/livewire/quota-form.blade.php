@@ -28,17 +28,20 @@
             }
         }
     </style>
+    @guest
     @if(!$is_success)
     <form>
         {{ $this->form }}
         
         <div class="flex items-center justify-between gap-4">
+           
               <x-filament::button  wire:click.prevent="create" type="submit" class="mt-3  w-1/2"  size="lg" tooltip="{{trans('dash.submit_only_tooltip')}}">
                 {{trans('dash.submit_quota')}}
               </x-filament::button>
               <x-filament::button  wire:click.prevent="createWithAccount" type="submit" class="mt-3  w-1/2"  size="lg" color="info" tooltip="{{trans('dash.submit_and_create_account_tooltip')}}">
                 {{trans('dash.submit_create_account')}}
               </x-filament::button>
+           
         </div>
     </form>
     @else 
@@ -50,12 +53,21 @@
                 <a wire:click.prevent="$set('is_success',false)" href="{{route('create_quota')}}"  class="btn bg-blue-500 rounded-lg text-white mt-3  w-1/2"  >
                 {{trans('dash.go_back')}}
                 </a>
-                <a  href="" type="submit" class="btn bg-gray-500 rounded-lg text-white mt-3  w-1/2"  >
+                <a  href="{{route('filament.client.auth.login')}}" type="submit" class="btn bg-gray-500 rounded-lg text-white mt-3  w-1/2"  >
                 {{trans('dash.login')}}
                 </a>
             </div>
         </div>
     @endif
-
+    @else 
+    <div class="p-12 rounded shadow-md dark:bg-gray-900 text-dark dark:text-white  text-center">
+        <div class="text-blue-500 font-semibold p-4 rounded">
+            {{trans('dash.this_form_is_for_guest')}}
+        </div>
+        <a  href="{{route("filament.client.resources.quotas.create")}}"  class="btn bg-gray-500 rounded-lg text-white mt-3  w-1/2"  >
+            {{trans('dash.go_to_dashboard')}}
+        </a>
+    </div>
+    @endguest
     @livewire('notifications')
 </div>

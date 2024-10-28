@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\Widgets;
+use App\Models\Setting;
 use Filament\PanelProvider;
 use Filament\Pages\Dashboard;
 use Firefly\FilamentBlog\Blog;
@@ -27,6 +28,8 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
+use Leandrocfe\FilamentApexCharts\FilamentApexChartsPlugin;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use SolutionForest\FilamentAccessManagement\FilamentAccessManagementPanel;
 
@@ -41,6 +44,7 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Amber,
             ])
             ->login(\Filament\Pages\Auth\Login::class)
+            ->favicon(asset('storage/'.Setting::first()->favicon))
             // ->spa()
             // ->navigation(function (NavigationBuilder $builder): NavigationBuilder {
             //     return $builder->items([
@@ -85,11 +89,11 @@ class AdminPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+               Dashboard::class
             ])
             ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\\Filament\\Admin\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
+                // Widgets\AccountWidget::class,
                 // Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
@@ -108,6 +112,19 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->default()
             ->viteTheme('resources/css/filament/client/theme.css')
-            ->plugin(FilamentAccessManagementPanel::make());;
+            ->plugins([
+                FilamentAccessManagementPanel::make(),
+                FilamentApexChartsPlugin::make(),
+                FilamentFullCalendarPlugin::make()
+                ->selectable(true)
+                ->editable(true)
+                ->selectable()
+                ->config([
+                    'initialView' => 'dayGridWeek', // show week by week
+                    'firstDay' => 0, // start the week on a Monday
+                    'eventDisplay' => 'block', // render a solid rectangle
+                ])
+            ]);
     }
+    
 }
