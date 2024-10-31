@@ -37,7 +37,19 @@
              <div class="md:flex items-center justify-start gap-8 text-gray-900 dark:text-white w-full py-5 px-6">
                 <span><strong> {{trans('dash.containers_count')}} : </strong></span> 
                 <x-filament::badge size="xl"     :color="'success'" >
-                  {{$order->containers_count}}
+                  @php
+                        $coontainers_list=[];
+                        if(count($order->containers))
+                        {
+                          foreach ($order->containers as $container) {
+                                  array_push($coontainers_list,"".$container['type'] .":".  $container['count']."");
+                                  // if ($container['count']) {
+                                  //     $coontainers_list += (int)$container['count'];
+                                  // }
+                          }
+                        }
+                  @endphp
+                  {{implode(' / ',$coontainers_list)}}
               </x-filament::badge>
              </div>
              {{-- <a href="contact.html" class="text-primary-600 text-sm underline">{{trans('dash.Expected_Delivery_Date')}}</a> --}}

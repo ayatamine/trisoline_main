@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\Widgets;
+use App\Models\Setting;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Http\Middleware\Authenticate;
@@ -17,6 +18,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Leandrocfe\FilamentApexCharts\FilamentApexChartsPlugin;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 
 class ClientPanelProvider extends PanelProvider
@@ -28,6 +30,8 @@ class ClientPanelProvider extends PanelProvider
             ->id('client')
             ->path('client')
             ->login(\Filament\Pages\Auth\Login::class)
+            ->brandLogo(url(Setting::first()->app_logo))
+            ->registration()
             ->colors([
                 'primary' => Color::Blue,
             ])
@@ -56,6 +60,9 @@ class ClientPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-            ->viteTheme('resources/css/filament/client/theme.css');
+            ->viteTheme('resources/css/filament/client/theme.css')
+            ->plugins([
+                FilamentApexChartsPlugin::make(),
+            ]);;
     }
 }

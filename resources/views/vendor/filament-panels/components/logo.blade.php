@@ -27,9 +27,13 @@
             {{ $logo }}
         </div>
     @elseif (filled($logo))
+    <style>
+        
+    </style>
         <img
             alt="{{ $brandName }}"
-            loading="lazy"
+            loading="lazy" style="height: 65px;margin:auto;padding:3px;
+        width: auto;"
             src="{{ $logo }}"
             {{
                 $attributes

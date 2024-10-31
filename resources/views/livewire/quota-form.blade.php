@@ -47,7 +47,7 @@
     @else 
         <div class="mt-20">
             <div class="bg-success bg-green-500 text-white p-4 rounded-2xl">
-                {{trans('dash.quota_created_successfully')}}
+               @if(!$register_account)  {{trans('dash.quota_created_successfully')}} @else  {{trans('dash.quota_with_registeration_created_successfully')}}  @endif
             </div>
             <div class="flex items-center justify-between gap-4 pt-3">
                 <a wire:click.prevent="$set('is_success',false)" href="{{route('create_quota')}}"  class="btn bg-blue-500 rounded-lg text-white mt-3  w-1/2"  >

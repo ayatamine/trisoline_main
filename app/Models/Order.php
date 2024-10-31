@@ -37,7 +37,7 @@ class Order extends Model
         'shipping_address_id',
         'currency_id',
         'vendor_info',
-        'containers_count',
+        'containers',
         'approved_at',
         'inspected_at',
         'completed_at',

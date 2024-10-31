@@ -28,6 +28,7 @@ use Filament\Notifications\Notification;
 use Filament\Forms\Components\FileUpload;
 use App\Forms\Components\ContractCondition;
 use Filament\Forms\Components\Actions\Action;
+use App\Notifications\SendRegistrationPassword;
 use Filament\Forms\Concerns\InteractsWithForms;
 
 class QuotaForm extends Component implements HasForms
@@ -240,6 +241,10 @@ class QuotaForm extends Component implements HasForms
                     'password'=>$password
                 ]);
                 $client = Client::create([ 'user_id'=>$user->id]);
+       
+                $user->notify( new SendRegistrationPassword($user->email,$password));
+
+
                 $products =$data['products'] ?? [];
                 $data['containers'] = array_values($data['containers']) ?? [];
                 unset($data['products']);

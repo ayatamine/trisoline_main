@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources;
 
+use Carbon\Carbon;
 use Filament\Forms;
 use App\Models\User;
 use Filament\Tables;
@@ -22,13 +23,16 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\Layout\View;
+use pxlrbt\FilamentExcel\Columns\Column;
 use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ViewEntry;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Admin\Resources\OrderResource\Pages;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use Filament\Infolists\Components\TextEntry\TextEntrySize;
 use App\Filament\Admin\Resources\OrderResource\RelationManagers;
 
@@ -47,6 +51,7 @@ class OrderResource extends Resource
     {
         return $form
         ->schema([
+           
             Forms\Components\Section::make('order info')
             ->label(trans('dash.order_info'))
             ->schema([
@@ -211,6 +216,27 @@ class OrderResource extends Resource
                 // Tables\Actions\EditAction::make()->hidden(fn(Order $order)=>$order->status !="pending"),
             ])
             ->bulkActions([
+                ExportBulkAction::make()->exports([
+                    ExcelExport::make()->withColumns([
+                        Column::make('name'),
+                        Column::make('client.user.name')->heading('Client Name'),
+                        Column::make('status'),
+                        Column::make('payment_status'),
+                        Column::make('expected_delivery_date'),
+                        Column::make('real_delivery_date'),
+                        Column::make('shippingAddress.fullAddress')->heading('Shipping Address'),
+                        Column::make('currency')->heading('Currency')
+                        ->formatStateUsing(fn ($state) => "$state->name ($state->symbol)"),
+                        Column::make('containers'),
+                        Column::make('inspected_at')
+                        ->formatStateUsing(fn ($state) => Carbon::createFromDate($state)),
+                        Column::make('approved_at')
+                        ->formatStateUsing(fn ($state) => Carbon::createFromDate($state)),
+                        Column::make('completed_at')
+                        ->formatStateUsing(fn ($state) => Carbon::createFromDate($state)),
+                    
+                    ])->askForFilename(),
+                ]),
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
@@ -232,25 +258,31 @@ class OrderResource extends Resource
 
 
                                 TextEntry::make('name')->label(trans('dash.name'))->weight(FontWeight::Bold),
-                                TextEntry::make( 'client.user.email')->label(trans('dash.email'))->weight(FontWeight::Bold),
+                                TextEntry::make( 'client.user.email')->label(trans('dash.email'))
+                                ->badge()
+                                ->icon('heroicon-m-envelope')
+                                ->color('info')
+                                ->copyable()
+                                ->copyMessage('Copied!')
+                                ->copyMessageDuration(1500)
+                                ->weight(FontWeight::Bold),
 
                                 TextEntry::make('expected_delivery_date')->label(trans('dash.expected_delivery_date'))->weight(FontWeight::Bold),
                                 TextEntry::make('real_delivery_date')->label(trans('dash.real_delivery_date'))->weight(FontWeight::Bold),
                                 TextEntry::make( 'shippingAddress.full_address')->label(trans('dash.address'))->weight(FontWeight::Bold),
-                                TextEntry::make('containers_count')->label(trans('dash.containers_count'))
-                                ->color('success')
-                                ->size(TextEntrySize::Large)
-                                ->weight(FontWeight::Bold),
-                                TextEntry::make('currency.name')->label(trans('dash.currency'))->weight(FontWeight::Bold),
+                                
+                                TextEntry::make(name: 'currency.name')->label(trans('dash.currency'))->weight(FontWeight::Bold),
                                 
                                 TextEntry::make('status')->label(trans('dash.status'))->weight(FontWeight::Bold)
                                 ->color('success')
                                 ->size(TextEntrySize::Large),
+                                ViewEntry::make('containers')->label(trans('dash.containers_count'))->view('infolists.components.containers-count'),
+
+                                
+                                TextEntry::make('created_at')->label(trans('dash.created_at'))->date()->weight(FontWeight::Bold),
                                 TextEntry::make(name: 'rejection_note')->label(trans('dash.rejection_note'))
                                 ->hidden(fn(Order $order)=> $order->rejection_note == null)
                                 ->weight(FontWeight::Bold),
-                                TextEntry::make('created_at')->label(trans('dash.created_at'))->date()->weight(FontWeight::Bold),
-                                ViewEntry::make('containers')->label(trans('dash.containers_count'))->view('infolists.components.containers-count'),
                         ]),
                     \Filament\Infolists\Components\Section::make(trans('dash.products_info'))
                         ->id('products_info-section')

@@ -16,6 +16,7 @@
         "laravel/tinker": "^2.8",
         "leandrocfe/filament-apex-charts": "3.1",
         "livewire/livewire": "^3.5",
+        "pxlrbt/filament-excel": "^2.3",
         "saade/filament-fullcalendar": "3.0",
         "solution-forest/filament-access-management": "^2.2",
         "spatie/livewire-filepond": "*",

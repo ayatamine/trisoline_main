@@ -22,16 +22,19 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ViewField;
 use Filament\Notifications\Notification;
+use pxlrbt\FilamentExcel\Columns\Column;
 use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Actions\Concerns\HasInfolist;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ViewEntry;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Filament\Infolists\Components\KeyValueEntry;
 use Filament\Infolists\Components\Actions\Action;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Admin\Resources\QuotaResource\Pages;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use App\Filament\Admin\Resources\QuotaResource\RelationManagers;
 
 class QuotaResource extends Resource
@@ -279,7 +282,7 @@ class QuotaResource extends Resource
                 ->action(function (array $data,Quota $record): void {
                     if($data['status'] == "processing") 
                     {
-                        if(!$record->discussion) $record->discussion->create(['discussable_type'=>Quota::class,'discussable_id'=>$record->id,'is_open'=>1]);
+                        if(!$record->discussion && ($record->client_id !== 0)) $record->discussion()->create(['discussable_type'=>Quota::class,'discussable_id'=>$record->id,'is_open'=>1]);
                         $data['rejected_at'] = null;
                         $data['processed_at'] = null;
                         $data['processing_at'] = now();
@@ -300,6 +303,39 @@ class QuotaResource extends Resource
                 // Tables\Actions\EditAction::make()->visible(fn(Quota $quota) =>$quota->status == 'pending'),
             ])
             ->bulkActions([
+                ExportBulkAction::make()->exports([
+                    ExcelExport::make()->withColumns([
+                        Column::make('business_name'),
+                        Column::make('legal_representative_name'),
+                        Column::make('country'),
+                        Column::make('full_address'),
+                        Column::make('phone_number'),
+                        Column::make('email'),
+                        Column::make('commercial_register_number'),
+                        Column::make('tax_number'),
+                        Column::make('available_budget'),
+                        Column::make('currency'),
+                        Column::make('available_budget'),
+                        Column::make('service_type'),
+                        Column::make('status'),
+                        Column::make('client.user.name')->heading('Client Name'),
+
+                        Column::make('processing_at'),
+                        Column::make('processed_at'),
+                        Column::make('expected_delivery_date'),
+                        Column::make('real_delivery_date'),
+                        Column::make('containers')->formatStateUsing(function ($state) {
+                            $concat=[];
+                           foreach($state as $k=>$co)
+                           {
+                                array_push($concat,"$k : $co");
+                           }
+                           return $concat;
+                        }),
+                    
+                    ])->askForFilename(),
+
+                ]),
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
@@ -331,13 +367,30 @@ class QuotaResource extends Resource
                                 TextEntry::make('legal_representative_name')->label(trans('dash.legal_representative_name'))->weight(FontWeight::Bold),
                                 TextEntry::make('country')->label(trans('dash.country'))->weight(FontWeight::Bold),
                                 TextEntry::make( 'full_address')->label(trans('dash.address'))->weight(FontWeight::Bold),
-                                TextEntry::make( 'phone_number')->label(trans('dash.phone_number'))->weight(FontWeight::Bold),
-                                TextEntry::make( 'email')->label(trans('dash.email'))->weight(FontWeight::Bold),
-                                TextEntry::make('available_budget')->label(trans('dash.available_budget'))->weight(FontWeight::Bold),
-                                TextEntry::make('currency')->label(trans('dash.currency'))->weight(FontWeight::Bold),
-                                TextEntry::make('rejection_note')->label(trans('dash.rejection_note'))->weight(FontWeight::Bold),
-                                TextEntry::make('created_at')->label(trans('dash.created_at'))->date()->weight(FontWeight::Bold),
+                                TextEntry::make( 'phone_number')->label(trans('dash.phone_number'))->weight(FontWeight::Bold)
+                                ->badge()
+                                ->color('info')
+                                ->copyable()
+                                ->copyMessage('Copied!')
+                                ->icon('heroicon-m-phone')
+                                ->copyMessageDuration(1500),
+                                TextEntry::make( 'email')->label(trans('dash.email'))->weight(FontWeight::Bold)
+                                ->icon('heroicon-m-envelope')
+                                ->badge()
+                                ->color('info')
+                                ->copyable()
+                                ->copyMessage('Copied!')
+                                ->copyMessageDuration(1500),
+                                
+                                TextEntry::make('available_budget')->label(trans('dash.available_budget'))
+                                ->formatStateUsing(callback: fn (Quota $quota) => $quota->available_budget." ".$quota->currency)
+                                ->weight(FontWeight::Bold),
                                 ViewEntry::make('containers')->label(trans('dash.containers_count'))->view('infolists.components.containers-count'),
+                                TextEntry::make('created_at')->label(trans('dash.created_at'))->date()->weight(FontWeight::Bold),
+
+                                TextEntry::make('rejection_note')->label(trans('dash.rejection_note'))
+                                ->hidden(fn (Quota $quota) => $quota->rejection_note == null)
+                                ->weight(FontWeight::Bold),
                         ]),
                     \Filament\Infolists\Components\Section::make(trans('dash.products_info'))
                         ->id('products_info-section')
